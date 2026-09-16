@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% block content %}
+<h1>🏆 KPI рейтинг</h1>
+<div class="card">
+<table><thead><tr><th>#</th><th>Продавец</th><th>💰 Продажи</th><th>Выручка</th><th>Точность</th></tr></thead><tbody>
+{% for k in leaderboard %}
+<tr><td>{{ k.rank }}</td><td>{{ k.full_name or k.username }}</td><td>{{ k.sales_count }}</td><td>{{ "%.0f"|format(k.revenue) }} ₽</td><td>{{ k.accuracy }}%</td></tr>
+{% else %}
+<tr><td colspan="5" style="text-align:center;padding:20px">Нет данных</td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+{% endblock %}

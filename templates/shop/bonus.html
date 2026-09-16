@@ -1,0 +1,16 @@
+{% extends "shop/base.html" %}{% block content %}
+<h1>🎁 Мои бонусы</h1>
+<div class="card" style="background:linear-gradient(135deg,#f39c12,#e74c3c);color:#fff">
+    <h3 style="color:#fff">Баланс</h3>
+    <div style="font-size:48px;font-weight:bold">{{ customer.bonus_points or 0 }}</div>
+    <div style="opacity:.9">1 point = 1 ₽ discount</div>
+</div>
+<div class="card">
+    <p><b>How it works:</b></p>
+    <ul style="margin-left:20px;margin-top:10px">
+        <li>Get 1% back from each delivered order</li>
+        <li>Списать баллы при заказе</li>
+        <li>Minimum 100 points to spend</li>
+    </ul>
+</div>
+{% endblock %}

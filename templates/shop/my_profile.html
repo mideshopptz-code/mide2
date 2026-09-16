@@ -1,0 +1,91 @@
+{% extends "shop/base.html" %}{% block content %}
+
+<div class="hero" style="padding:60px 40px">
+  <h2>{{ customer.name }}</h2>
+  <p>{{ customer.phone }}</p>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
+  <div class="card">
+    <h3>💰 Мои баллы</h3>
+    <div style="font-size:48px;font-weight:900;color:#ed1d36;margin:12px 0">
+      {{ customer.bonus_points or 0 }}
+    </div>
+    <p style="color:#6b7280">1 балл = 1 ₽ скидки</p>
+    <a href="/shop/bonus" class="btn btn-red" style="margin-top:14px;width:100%">Как потратить?</a>
+  </div>
+
+  <div class="card">
+    <h3>📊 Моя статистика</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
+      <div>
+        <div style="font-size:12px;color:#6b7280">Заказов</div>
+        <div style="font-size:28px;font-weight:900">{{ stats.delivered or 0 }}</div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:#6b7280">Потрачено</div>
+        <div style="font-size:28px;font-weight:900">{{ "%.0f"|format(stats.total_spent or 0) }} ₽</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>📦 Мои заказы ({{ orders|length }})</h3>
+  {% if orders %}
+  <table>
+    <thead><tr>
+      <th>№</th><th>Дата</th><th>Сумма</th><th>Статус</th><th></th>
+    </tr></thead>
+    <tbody>
+    {% for o in orders %}
+    <tr>
+      <td>#{{ o.id }}</td>
+      <td style="font-size:12px">{{ o.created_at }}</td>
+      <td><b>{{ "%.2f"|format(o.total_amount) }} ₽</b></td>
+      <td>
+        {% if o.status == 'new' %}🆕
+        {% elif o.status == 'taken' %}📦
+        {% elif o.status == 'delivered' %}✅
+        {% else %}❌{% endif %}
+        {{ o.status }}
+      </td>
+      <td><a href="/shop/orders/{{ o.id }}" class="btn btn-sm btn-red">Открыть</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="text-align:center;color:#6b7280;padding:20px">Заказов пока нет</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h3>🎯 Мои миссии</h3>
+  <a href="/shop/missions" class="btn btn-red" style="margin-bottom:16px">Смотреть все миссии</a>
+  {% if missions %}
+  <table>
+    <thead><tr>
+      <th>Миссия</th><th>Прогресс</th><th>Статус</th>
+    </tr></thead>
+    <tbody>
+    {% for m in missions if m.user_status != 'not_started' %}
+    <tr>
+      <td>{{ m.icon }} {{ m.title }}</td>
+      <td>{{ m.user_current|int }} / {{ m.target_value|int }}</td>
+      <td>
+        {% if m.user_status == 'completed' %}✅ Выполнено
+        {% elif m.user_status == 'pending_approval' %}⏳ На проверке
+        {% elif m.user_status == 'rejected' %}❌ Отклонено
+        {% else %}🔄 В процессе{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="text-align:center;color:#6b7280;padding:20px">Активных миссий нет</p>
+  {% endif %}
+</div>
+
+{% endblock %}

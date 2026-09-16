@@ -1,0 +1,28 @@
+{% extends "base.html" %}{% block content %}
+<h1>📊 Панель управления</h1>
+<div class="stats">
+<div class="stat-box"><h3>Всего заказов</h3><div class="value">{{ stats.total_orders or 0 }}</div></div>
+<div class="stat-box"><h3>Доставлен</h3><div class="value" style="color:#27ae60">{{ stats.delivered or 0 }}</div></div>
+<div class="stat-box"><h3>Выручка</h3><div class="value">{{ "%.0f"|format(stats.revenue or 0) }} ₽</div></div>
+</div>
+<div class="card">
+<h3>🏆 Топ товаров</h3>
+<table><thead><tr><th>Товар</th><th>Кол-во</th><th>Выручка</th></tr></thead><tbody>
+{% for p in top_products %}
+<tr><td>{{ p.product_name }}</td><td>{{ p.qty }}</td><td>{{ "%.0f"|format(p.revenue) }} ₽</td></tr>
+{% else %}
+<tr><td colspan="3" style="text-align:center;padding:20px">Нет данных</td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+<div class="card">
+<h3>🏆 Топ продавцов</h3>
+<table><thead><tr><th>Продавец</th><th>Заказов</th><th>Выручка</th></tr></thead><tbody>
+{% for s in top_sellers %}
+<tr><td>{{ s.full_name or s.username }}</td><td>{{ s.count }}</td><td>{{ "%.0f"|format(s.revenue) }} ₽</td></tr>
+{% else %}
+<tr><td colspan="3" style="text-align:center;padding:20px">Нет данных</td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+{% endblock %}

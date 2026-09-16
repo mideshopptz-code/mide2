@@ -1,0 +1,38 @@
+{% extends "base.html" %}{% block content %}
+<h1>🔄 Переводы</h1>
+<div class="card">
+    <a href="/transfers/new" class="btn btn-success">+ Новый перевод</a>
+</div>
+<div class="card">
+<table>
+<thead><tr>
+    <th>№</th><th>От кого</th><th>Кому</th><th>Товар</th><th>Кол-во</th>
+    <th>📊 Статус</th><th>Admin?</th><th></th>
+</tr></thead>
+<tbody>
+{% for t in transfers %}
+<tr>
+    <td>{{ t.id }}</td>
+    <td>{{ t.from_name or t.from_username }}</td>
+    <td>{{ t.to_name or t.to_username }}</td>
+    <td>{{ t.product_name }}</td>
+    <td>{{ t.quantity }}</td>
+    <td>{{ t.status }}</td>
+    <td>{% if t.requires_admin %}yes{% endif %}</td>
+    <td>
+        {% if t.status == 'pending' and user.role in ('admin','senior_seller') %}
+        <form method="post" action="/transfers/{{ t.id }}/approve" style="display:inline">
+            <button class="btn btn-sm btn-success">OK</button>
+        </form>
+        <form method="post" action="/transfers/{{ t.id }}/reject" style="display:inline">
+            <button class="btn btn-sm btn-danger">NO</button>
+        </form>
+        {% endif %}
+    </td>
+</tr>
+{% else %}
+<tr><td colspan="8" style="text-align:center;padding:20px">Переводов нет</td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+{% endblock %}

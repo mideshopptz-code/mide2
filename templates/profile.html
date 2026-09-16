@@ -1,0 +1,40 @@
+{% extends "base.html" %}{% block content %}
+<h1>👤 Мой профиль</h1>
+
+<div class="card" style="max-width:600px">
+    <h3>📋 Информация</h3>
+    <p><b>Логин:</b> {{ profile_user.username }}</p>
+    <p><b>Должность:</b> <span class="role-badge role-{{ profile_user.role }}">{{ profile_user.role }}</span></p>
+    <p><b>Комиссия:</b> {{ profile_user.commission_rate or 0 }}%</p>
+</div>
+
+<div class="card" style="max-width:600px">
+    <h3>📱 Telegram-уведомления</h3>
+    {% if profile_user.telegram_id %}
+        <p>Telegram привязан (ID: {{ profile_user.telegram_id }})</p>
+        <form method="post">
+            <button class="btn btn-danger" name="unlink_telegram" type="submit">Отвязать</button>
+        </form>
+    {% else %}
+        <p>Не привязан. Get a code and send it to the bot.</p>
+        {% if profile_user.telegram_code %}
+        <div style="background:#fff3cd;padding:12px;border-radius:6px;margin-bottom:12px">
+            <b>Your code:</b> <code>{{ profile_user.telegram_code }}</code><br>
+            Send to bot: <code>/link {{ profile_user.telegram_code }}</code>
+        </div>
+        {% endif %}
+        <form method="post">
+            <button class="btn btn-success" name="generate_code" type="submit">Получить код</button>
+        </form>
+    {% endif %}
+</div>
+
+<div class="card" style="max-width:600px">
+    <h3>✏️ Изменить имя</h3>
+    <form method="post">
+        <label>Полное имя</label>
+        <input name="full_name" value="{{ profile_user.full_name or '' }}">
+        <button class="btn btn-success" name="save" type="submit">Сохранить</button>
+    </form>
+</div>
+{% endblock %}

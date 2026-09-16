@@ -1,0 +1,27 @@
+{% extends "base.html" %}{% block content %}
+<h1>📝 Ревизии</h1>
+<div class="card">
+    <a href="/revisions/new" class="btn btn-warning">+ Запросить ревизию</a>
+</div>
+<div class="card">
+<table>
+<thead><tr>
+    <th>№</th><th>Запросил</th><th>Цель</th>
+    <th>📊 Статус</th><th>Создано</th><th></th>
+</tr></thead>
+<tbody>
+{% for r in revisions %}
+<tr>
+    <td>{{ r.id }}</td>
+    <td>{{ r.requester_name }}</td>
+    <td>{{ r.target_name or r.target_username }}</td>
+    <td>{{ r.status }}</td>
+    <td style="font-size:12px">{{ r.created_at }}</td>
+    <td><a href="/revisions/{{ r.id }}" class="btn btn-sm">Открыть</a></td>
+</tr>
+{% else %}
+<tr><td colspan="6" style="text-align:center;padding:20px">Ревизий нет</td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+{% endblock %}

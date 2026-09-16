@@ -1,0 +1,27 @@
+{% extends "base.html" %}{% block content %}
+<h1>📦 Мои товары</h1>
+<div class="stats">
+<div class="stat-box"><h3>Товаров</h3><div class="value">{{ products|length }}</div></div>
+<div class="stat-box"><h3>Общая стоимость</h3><div class="value">{{ '%.0f'|format(total_value) }} ₽</div></div>
+<div class="stat-box"><h3>Мало на складе</h3><div class="value" style="color:#e74c3c">{{ low_stock }}</div></div>
+</div>
+<div class="card">
+<a href="/product/add" class="btn btn-success">+ Добавить товар</a>
+</div>
+<div class="card">
+<table>
+<thead><tr><th>№</th><th>Название</th><th>Категория</th><th>Кол-во</th><th>Цена</th><th></th></tr></thead>
+<tbody>
+{% for p in products %}
+<tr {% if p.quantity <= p.min_stock %}style="background:#fff5f5"{% endif %}>
+<td>{{ p.id }}</td><td>{{ p.name }}</td><td>{{ p.category or '-' }}</td>
+<td>{{ p.quantity }}</td><td>{{ '%.2f'|format(p.price) }} ₽</td>
+<td>
+<a href="/product/edit/{{ p.id }}" class="btn btn-sm">Изменить</a>
+<form method="post" action="/product/delete/{{ p.id }}" style="display:inline" onsubmit="return confirm('Delete?')">
+<button class="btn btn-sm btn-danger">Удалить</button></form>
+</td></tr>
+{% else %}<tr><td colspan="6" style="text-align:center;padding:20px">Товаров нет</td></tr>
+{% endfor %}
+</tbody></table></div>
+{% endblock %}

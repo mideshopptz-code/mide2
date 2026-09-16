@@ -1,0 +1,45 @@
+{% extends "base.html" %}{% block content %}
+<h1>💰 Продажи</h1>
+<div class="card">
+    <a href="/sales/new" class="btn btn-success">+ Новая продажа</a>
+</div>
+<div class="card">
+<table>
+<thead><tr>
+    <th>№</th><th>Продавец</th><th>Товар</th><th>Кол-во</th>
+    <th>Ожидается</th><th>Факт</th><th>📊 Статус</th><th></th>
+</tr></thead>
+<tbody>
+{% for s in sales %}
+<tr {% if not s.is_correct %}style="background:#fff5f5"{% endif %}>
+    <td>{{ s.id }}</td>
+    <td>{{ s.seller_name or s.seller_username }}</td>
+    <td>{{ s.product_name }}</td>
+    <td>{{ s.quantity }}</td>
+    <td>{{ '%.2f'|format(s.expected_amount) }} ₽</td>
+    <td style="color:{% if s.is_correct %}#27ae60{% else %}#e74c3c{% endif %}">
+        <b>{{ '%.2f'|format(s.actual_amount) }} ₽</b>
+        {% if not s.is_correct %} !!{% endif %}
+    </td>
+    <td>
+        {% if s.status == 'pending' %}pending
+        {% elif s.status == 'approved' %}approved
+        {% else %}rejected{% endif %}
+    </td>
+    <td>
+        {% if s.status == 'pending' and user.role in ('admin','senior_seller','mentor') and user.id != s.seller_id %}
+        <form method="post" action="/sales/{{ s.id }}/approve" style="display:inline">
+            <button class="btn btn-sm btn-success">OK</button>
+        </form>
+        <form method="post" action="/sales/{{ s.id }}/reject" style="display:inline">
+            <button class="btn btn-sm btn-danger">NO</button>
+        </form>
+        {% endif %}
+    </td>
+</tr>
+{% else %}
+<tr><td colspan="8" style="text-align:center;padding:20px">Продаж нет</td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+{% endblock %}

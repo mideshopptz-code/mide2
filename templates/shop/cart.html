@@ -1,0 +1,53 @@
+{% extends "shop/base.html" %}{% block content %}
+<h1>Корзина</h1>
+{% if items %}
+<div class="card">
+<table>
+<thead><tr><th>Товар</th><th>Цена</th><th>Кол-во</th><th>Итого</th></tr></thead>
+<tbody>
+{% for it in items %}
+<tr><td>{{ it.product.name }}</td><td>{{ '%.2f'|format(it.product.price) }} ₽</td>
+<td>{{ it.quantity }}</td><td>{{ '%.2f'|format(it.subtotal) }} ₽</td></tr>
+{% endfor %}
+</tbody></table>
+<div style="text-align:right;margin-top:16px;font-size:20px">
+Сумма: <b style="color:#e74c3c">{{ '%.2f'|format(total) }} ₽</b>
+</div>
+</div>
+
+{% if customer %}
+<div class="card">
+<h3>Оформить заказ</h3>
+<form method="post" action="/shop/checkout">
+    <label>Адрес доставки *</label>
+    <input name="address" required value="{{ customer.district or '' }}">
+
+    {% if customer.bonus_points and customer.bonus_points >= 100 %}
+    <div style="background:#fff3cd;padding:12px;border-radius:6px;margin-bottom:12px">
+        <b>You have {{ customer.bonus_points }} points!</b>
+        <label style="margin-top:8px">Spend points (max 50% of order)</label>
+        <input name="bonus_spent" type="number" min="0"
+               max="{{ customer.bonus_points }}"
+               value="0" style="margin:0">
+    </div>
+    {% endif %}
+
+    <label>Комментарий</label>
+    <textarea name="comment" rows="2"></textarea>
+    <button class="btn" type="submit" style="width:100%;padding:14px">✅ Оформить заказ</button>
+</form>
+</div>
+{% else %}
+<div class="card" style="text-align:center;padding:30px">
+<p style="margin-bottom:16px">Войдите чтобы оформить заказ</p>
+<a href="/shop/login" class="btn">🔐 Вход</a>
+</div>
+{% endif %}
+
+{% else %}
+<div class="card" style="text-align:center;padding:60px">
+<p style="font-size:18px;color:#7f8c8d;margin-bottom:20px">Корзина пуста</p>
+<a href="/shop" class="btn">Перейти в каталог</a>
+</div>
+{% endif %}
+{% endblock %}

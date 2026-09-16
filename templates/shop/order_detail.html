@@ -1,0 +1,49 @@
+{% extends "shop/base.html" %}{% block content %}
+<h1>Заказ #{{ order.id }}</h1>
+<div class="card">
+<p><b>Статус:</b> {{ order.status }}</p>
+<p><b>Адрес:</b> {{ order.address or '-' }}</p>
+{% if order.staff_name %}<p><b>Сотрудник:</b> {{ order.staff_name }}</p>{% endif %}
+<p><b>Сумма:</b> {{ '%.2f'|format(order.total_amount) }} ₽</p>
+</div>
+<div class="card">
+<h3>🛒 Состав заказа</h3>
+<table><tbody>
+{% for it in order['items'] %}
+<tr><td>{{ it.product_name }}</td><td>{{ it.quantity }} x {{ '%.2f'|format(it.product_price) }} ₽</td>
+<td style="text-align:right">{{ '%.2f'|format(it.subtotal) }} ₽</td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+<div class="card">
+<h3>💬 Чат с продавцом</h3>
+<div id="chat" style="height:300px;overflow-y:auto;background:#f8f9fa;padding:12px;border-radius:6px;margin-bottom:12px">
+{% for m in messages %}
+<div style="margin-bottom:8px;{% if m.sender_type=='customer' %}text-align:right{% endif %}">
+<span style="background:{% if m.sender_type=='customer' %}#e74c3c{% else %}#ecf0f1{% endif %};color:{% if m.sender_type=='customer' %}#fff{% else %}#333{% endif %};padding:8px 12px;border-radius:12px;display:inline-block;max-width:70%;text-align:left">
+<b style="font-size:11px;opacity:.7">{{ m.sender_name }}</b><br>{{ m.message }}
+</span></div>
+{% endfor %}
+</div>
+<form method="post" action="/shop/orders/{{ order.id }}/chat" style="display:flex;gap:8px">
+<input name="message" placeholder="Написать сообщение..." style="margin:0;flex:1" autocomplete="off">
+<button class="btn" type="submit">Отправить</button>
+</form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+socket.emit('join_order', {order_id: {{ order.id }}});
+socket.on('chat_message', function(d){
+    if(d.order_id !== {{ order.id }}) return;
+    if(d.sender_type === 'customer') return;
+    var chat = document.getElementById('chat');
+    var div = document.createElement('div');
+    div.style.textAlign = 'left';
+    div.innerHTML = '<span style="background:#ecf0f1;color:#333;padding:8px 12px;border-radius:12px;display:inline-block;max-width:70%"><b style="font-size:11px;opacity:.7">'+d.sender_name+'</b><br>'+d.message+'</span>';
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+});
+document.getElementById('chat').scrollTop = 99999;
+</script>
+{% endblock %}

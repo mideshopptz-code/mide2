@@ -1,0 +1,36 @@
+{% extends "base.html" %}{% block content %}
+<div class="card" style="max-width:600px;margin:auto">
+<h1>{{ 'Edit' if user else 'Add' }} employee</h1>
+<form method="post">
+    <label>Логин</label>
+    <input name="username" value="{{ user.username if user else '' }}"
+           {% if user %}disabled{% else %}required{% endif %}>
+    <label>Пароль {% if user %}(leave empty to keep){% endif %}</label>
+    <input name="password" type="password" {% if not user %}required{% endif %}>
+    <label>Полное имя</label>
+    <input name="full_name" value="{{ user.full_name if user else '' }}">
+    <label>Должность</label>
+    <select name="role" {% if user and user.role == 'admin' %}disabled{% endif %}>
+        <option value="senior_seller" {% if user and user.role == 'senior_seller' %}selected{% endif %}>Старший продавец</option>
+        <option value="mentor" {% if user and user.role == 'mentor' %}selected{% endif %}>Наставник</option>
+        <option value="seller" {% if user and user.role == 'seller' %}selected{% endif %}>Продавец</option>
+        <option value="accountant" {% if user and user.role == 'accountant' %}selected{% endif %}>💼 Бухгалтер</option>
+    </select>
+    <label>Manager (who reports to this person)</label>
+    <select name="parent_id">
+        <option value="">-- none --</option>
+        {% for p in parents %}
+        <option value="{{ p.id }}"
+            {% if user and user.parent_id == p.id %}selected{% endif %}>
+            {{ p.full_name or p.username }} ({{ p.role }})
+        </option>
+        {% endfor %}
+    </select>
+    <label>Размер комиссии (%)</label>
+    <input name="commission_rate" type="number" step="0.1" min="0" max="100"
+           value="{{ user.commission_rate if user else 0 }}">
+    <button class="btn btn-success" type="submit">Сохранить</button>
+    <a href="/staff" class="btn" style="background:#95a5a6">Отмена</a>
+</form>
+</div>
+{% endblock %}

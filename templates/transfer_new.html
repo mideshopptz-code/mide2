@@ -1,0 +1,31 @@
+{% extends "base.html" %}{% block content %}
+<div class="card" style="max-width:500px;margin:auto">
+<h1>🔄 Новый перевод</h1>
+{% if user.role == 'senior_seller' %}
+<div style="background:#fff3cd;padding:10px;border-radius:4px;margin-bottom:12px">
+    Senior transfers require admin approval
+</div>
+{% endif %}
+<form method="post">
+    <label>Кому передать</label>
+    <select name="to_user_id" required>
+        <option value="">-- выберите --</option>
+        {% for u in users %}
+        <option value="{{ u.id }}">{{ u.full_name or u.username }} ({{ u.role }})</option>
+        {% endfor %}
+    </select>
+    <label>Товар</label>
+    <select name="product_id" required>
+        <option value="">-- выберите --</option>
+        {% for p in products %}
+        <option value="{{ p.id }}">{{ p.name }} ({{ p.quantity }} pcs)</option>
+        {% endfor %}
+    </select>
+    <label>Количество</label>
+    <input name="quantity" type="number" min="1" required>
+    <label>Комментарий</label>
+    <textarea name="comment" rows="2"></textarea>
+    <button class="btn btn-success" type="submit">Создать перевод</button>
+</form>
+</div>
+{% endblock %}

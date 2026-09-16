@@ -1,0 +1,27 @@
+{% extends "base.html" %}{% block content %}
+<h1>👥 Моя команда</h1>
+<div class="card">
+    <a href="/revisions/new" class="btn btn-warning">+ Запросить ревизию</a>
+</div>
+<div class="card">
+<table>
+<thead><tr>
+    <th>№</th><th>Название</th><th>Должность</th>
+    <th>Товаров</th><th>Стоимость склада</th><th></th>
+</tr></thead>
+<tbody>
+{% for m in team %}
+<tr>
+    <td>{{ m.user.id }}</td>
+    <td>{{ m.user.full_name or m.user.username }}</td>
+    <td><span class="role-badge role-{{ m.user.role }}">{{ m.user.role }}</span></td>
+    <td>{{ m.products_count }}</td>
+    <td>{{ '%.2f'|format(m.total_value) }} ₽</td>
+    <td><a href="/team/member/{{ m.user.id }}" class="btn btn-sm">Просмотр</a></td>
+</tr>
+{% else %}
+<tr><td colspan="6" style="text-align:center;padding:20px">Пока нет подчинённых</td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+{% endblock %}

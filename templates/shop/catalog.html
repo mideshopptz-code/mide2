@@ -1,0 +1,53 @@
+{% extends "shop/base.html" %}{% block content %}
+
+<div class="hero">
+  <h2>MIDE<span style="color:var(--purple-light)">.</span></h2>
+  <p>Премиальный магазин товаров повседневного спроса</p>
+</div>
+
+<h1>🛍️ Каталог товаров</h1>
+
+<div class="grid">
+{% for p in products %}
+  <div class="product">
+    <div class="product-img">
+      {% if p.main_image %}
+        <img src="/static/uploads/{{ p.main_image }}" alt="{{ p.name }}">
+      {% else %}
+        📦
+      {% endif %}
+    </div>
+    <div class="product-body">
+      <div class="product-meta">{{ p.category or 'Категория' }}</div>
+      <div class="product-title">{{ p.name }}</div>
+      <div class="product-seller">🏪 {{ p.seller_name or p.seller_username }}</div>
+
+      <div class="product-price">
+        <span class="amount">{{ "%.0f"|format(p.price) }}</span>
+        <span class="currency">₽</span>
+      </div>
+
+      <div class="product-stock{% if p.quantity < 10 %} product-stock-low{% endif %}">
+        {% if p.quantity > 0 %}✓ В наличии: {{ p.quantity }} шт.{% else %}✗ Нет в наличии{% endif %}
+      </div>
+
+      {% if p.quantity > 0 %}
+      <form method="post" action="/shop/cart/add/{{ p.id }}">
+        <input type="hidden" name="quantity" value="1">
+        <button class="btn btn-red" type="submit" style="width:100%">🛒 В корзину</button>
+      </form>
+      {% else %}
+      <button class="btn" disabled style="width:100%;opacity:.4;cursor:not-allowed">Нет в наличии</button>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="empty-state" style="grid-column:1/-1">
+    <div class="icon">📦</div>
+    <h3>Товаров пока нет</h3>
+    <p>Заходите позже — мы пополняем ассортимент</p>
+  </div>
+{% endfor %}
+</div>
+
+{% endblock %}

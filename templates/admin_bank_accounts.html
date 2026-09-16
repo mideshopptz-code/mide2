@@ -1,0 +1,71 @@
+{% extends "base.html" %}{% block content %}
+<h1>💳 Банковские счета</h1>
+
+<div class="stats">
+  <div class="stat-box">
+    <h3>Всего счетов</h3>
+    <div class="value">{{ accounts|length }}</div>
+  </div>
+  <div class="stat-box" style="background:linear-gradient(135deg,#27ae60,#16a085);color:#fff">
+    <h3 style="color:rgba(255,255,255,.8)">ОБЩИЙ БАЛАНС</h3>
+    <div class="value" style="color:#fff">{{ "%.2f"|format(total) }} ₽</div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>➕ Добавить счёт</h3>
+  <form method="post" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;margin-top:12px">
+    <input type="hidden" name="action" value="create">
+    <input name="name" placeholder="Название (Сбербанк)" required style="margin:0">
+    <input name="bank" placeholder="Банк (sberbank)" style="margin:0">
+    <input name="account_number" placeholder="Номер счёта" style="margin:0">
+    <button class="btn btn-success" type="submit">Добавить</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3>Все счета</h3>
+  <table style="margin-top:12px">
+    <thead><tr>
+      <th>Название</th><th>Банк</th><th>Номер</th>
+      <th>Баланс</th><th>Активен</th><th>Действия</th>
+    </tr></thead>
+    <tbody>
+    {% for a in accounts %}
+    <tr>
+      <td><b>{{ a.name }}</b></td>
+      <td>{{ a.bank or '-' }}</td>
+      <td style="font-family:monospace;font-size:13px">{{ a.account_number or '-' }}</td>
+      <td><b style="color:{% if a.balance > 0 %}#27ae60{% elif a.balance < 0 %}#e74c3c{% else %}#7f8c8d{% endif %};font-size:16px">
+        {{ "%.2f"|format(a.balance) }} ₽
+      </b></td>
+      <td>{% if a.is_active %}✅{% else %}🚫{% endif %}</td>
+      <td>
+        <details style="display:inline-block">
+          <summary style="cursor:pointer" class="btn btn-sm">✏️</summary>
+          <div style="position:absolute;background:#fff;padding:16px;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.15);z-index:100;margin-top:8px">
+            <form method="post" style="display:grid;gap:8px;min-width:280px">
+              <input type="hidden" name="action" value="update">
+              <input type="hidden" name="aid" value="{{ a.id }}">
+              <input name="name" value="{{ a.name }}" required>
+              <input name="bank" value="{{ a.bank or '' }}">
+              <input name="account_number" value="{{ a.account_number or '' }}">
+              <label><input type="checkbox" name="is_active" {% if a.is_active %}checked{% endif %}> Активен</label>
+              <button class="btn btn-sm btn-success">Сохранить</button>
+            </form>
+          </div>
+        </details>
+        <form method="post" style="display:inline" onsubmit="return confirm('Удалить счёт?')">
+          <input type="hidden" name="action" value="delete">
+          <input type="hidden" name="aid" value="{{ a.id }}">
+          <button class="btn btn-sm btn-danger">🗑️</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<a href="/finance" class="btn">← К финансам</a>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}{% block content %}
+<h1>Revision #{{ revision.id }}</h1>
+
+<div class="card">
+    <p><b>Target:</b> {{ target.full_name or target.username }}</p>
+    <p><b>Статус:</b> {{ revision.status }}</p>
+    {% if revision.comment %}<p><b>Комментарий:</b> {{ revision.comment }}</p>{% endif %}
+</div>
+
+{% if revision.status == 'requested' %}
+<form method="post">
+    <div class="card">
+        <h3>Введите фактические остатки</h3>
+        <table>
+            <thead><tr><th>Товар</th><th>Ожидается</th><th>Факт</th></tr></thead>
+            <tbody>
+            {% for p in products %}
+            <tr>
+                <td>{{ p.name }}</td>
+                <td>{{ p.quantity }}</td>
+                <td><input type="number" name="actual_{{ p.id }}"
+                           value="{{ p.quantity }}" min="0"
+                           style="width:100px;margin:0"></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <label>Комментарий к результату</label>
+        <textarea name="comment" rows="2"></textarea>
+        <br>
+        <button class="btn btn-success" type="submit">✅ Завершить ревизию</button>
+    </div>
+</form>
+{% endif %}
+
+{% if items %}
+<div class="card">
+    <h3>Результаты</h3>
+    <table>
+        <thead><tr><th>Товар</th><th>Ожидается</th><th>Факт</th><th>Расхождение</th></tr></thead>
+        <tbody>
+        {% for i in items %}
+        <tr>
+            <td>{{ i.product_name }}</td>
+            <td>{{ i.expected_qty }}</td>
+            <td>{{ i.actual_qty }}</td>
+            <td style="font-weight:bold">
+                {% if i.diff > 0 %}+{% endif %}{{ i.diff }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% block content %}
+<h1>{{ member.full_name or member.username }}'s warehouse</h1>
+<div class="card">
+    <p><b>Должность:</b> <span class="role-badge role-{{ member.role }}">{{ member.role }}</span></p>
+    <p><b>Total value:</b> {{ '%.2f'|format(total_value) }} ₽</p>
+</div>
+<div class="card">
+<table>
+<thead><tr><th>Название</th><th>Категория</th><th>Кол-во</th><th>Цена</th></tr></thead>
+<tbody>
+{% for p in products %}
+<tr>
+    <td>{{ p.name }}</td>
+    <td>{{ p.category or '-' }}</td>
+    <td>{{ p.quantity }}</td>
+    <td>{{ '%.2f'|format(p.price) }} ₽</td>
+</tr>
+{% else %}
+<tr><td colspan="4" style="text-align:center;padding:20px">Товаров нет</td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}{% block content %}
+<h1>📊 История транзакций</h1>
+
+<div class="card">
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <a href="/finance/transactions" class="btn btn-sm {% if not current_type and not current_status %}btn-success{% endif %}">Все</a>
+    <a href="/finance/transactions?type=income" class="btn btn-sm {% if current_type == 'income' %}btn-success{% endif %}">📥 Поступления</a>
+    <a href="/finance/transactions?type=expense" class="btn btn-sm {% if current_type == 'expense' %}btn-success{% endif %}">📤 Расходы</a>
+    <a href="/finance/transactions?status=pending" class="btn btn-sm {% if current_status == 'pending' %}btn-success{% endif %}">⏳ Ожидают</a>
+    <a href="/finance/transactions?status=approved" class="btn btn-sm {% if current_status == 'approved' %}btn-success{% endif %}">✅ Одобрено</a>
+    <a href="/finance/transactions?status=rejected" class="btn btn-sm {% if current_status == 'rejected' %}btn-success{% endif %}">❌ Отклонено</a>
+  </div>
+</div>
+
+<div class="card">
+  <table>
+    <thead><tr>
+      <th>Дата</th><th>Тип</th><th>Счёт</th><th>Сумма</th>
+      <th>Статус</th><th>Кто</th><th>Комментарий</th><th></th>
+    </tr></thead>
+    <tbody>
+    {% for t in transactions %}
+    <tr>
+      <td style="font-size:12px">{{ t.created_at }}</td>
+      <td>{% if t.type == 'income' %}📥{% else %}📤{% endif %} {{ t.type }}</td>
+      <td>{{ t.account_name }}</td>
+      <td><b style="color:{% if t.type == 'income' %}#27ae60{% else %}#e74c3c{% endif %}">
+        {% if t.type == 'income' %}+{% else %}−{% endif %}{{ "%.2f"|format(t.amount) }} ₽
+      </b></td>
+      <td>{% if t.status == 'pending' %}⏳{% elif t.status == 'approved' %}✅{% else %}❌{% endif %} {{ t.status }}</td>
+      <td style="font-size:12px">{{ t.seller_name or t.requester_name or '—' }}{% if t.order_id %}<br>Заказ #{{ t.order_id }}{% endif %}</td>
+      <td style="font-size:12px">{{ t.comment or '-' }}</td>
+      <td><a href="/finance/transaction/{{ t.id }}" class="btn btn-sm">Открыть</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="8" style="text-align:center;padding:20px">Нет транзакций</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<a href="/finance" class="btn">← Назад</a>
+{% endblock %}

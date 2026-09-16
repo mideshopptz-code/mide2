@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block content %}
+<h1>🔔 Уведомления</h1>
+<div class="card">
+{% for n in notifications %}
+<div style="padding:12px;border-bottom:1px solid #ecf0f1;{% if not n.is_read %}background:#eaf4fc{% endif %}">
+<b>{{ n.title }}</b>
+<div style="font-size:13px;color:#666">{{ n.body }}</div>
+<div style="font-size:11px;color:#95a5a6">{{ n.created_at }}</div>
+</div>
+{% else %}<p style="text-align:center;padding:20px;color:#7f8c8d">Уведомлений нет</p>
+{% endfor %}
+</div>
+{% endblock %}

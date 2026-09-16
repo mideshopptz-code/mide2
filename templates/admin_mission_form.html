@@ -1,0 +1,143 @@
+{% extends "base.html" %}{% block content %}
+<h1>{{ '✏️ Редактировать' if mission else '🎯 Создать миссию' }}</h1>
+
+<div class="card" style="max-width:700px;margin:auto">
+
+<form method="post" id="missionForm">
+
+  <label>Тип миссии *</label>
+  <div class="mission-types" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px">
+    <label class="type-card" data-type="buy">
+      <input type="radio" name="mission_category" value="buy" {% if mission and mission.mission_category == 'buy' %}checked{% elif not mission %}checked{% endif %}>
+      <div>
+        <div style="font-size:32px">🛒</div>
+        <b>Купить</b>
+      </div>
+    </label>
+    <label class="type-card" data-type="subscribe">
+      <input type="radio" name="mission_category" value="subscribe" {% if mission and mission.mission_category == 'subscribe' %}checked{% endif %}>
+      <div>
+        <div style="font-size:32px">📱</div>
+        <b>Подписаться</b>
+      </div>
+    </label>
+    <label class="type-card" data-type="invite">
+      <input type="radio" name="mission_category" value="invite" {% if mission and mission.mission_category == 'invite' %}checked{% endif %}>
+      <div>
+        <div style="font-size:32px">👥</div>
+        <b>Пригласить</b>
+      </div>
+    </label>
+    <label class="type-card" data-type="post">
+      <input type="radio" name="mission_category" value="post" {% if mission and mission.mission_category == 'post' %}checked{% endif %}>
+      <div>
+        <div style="font-size:32px">📝</div>
+        <b>Пост</b>
+      </div>
+    </label>
+    <label class="type-card" data-type="task">
+      <input type="radio" name="mission_category" value="task" {% if mission and mission.mission_category == 'task' %}checked{% endif %}>
+      <div>
+        <div style="font-size:32px">✅</div>
+        <b>Задание</b>
+      </div>
+    </label>
+  </div>
+
+  <label>Иконка (emoji)</label>
+  <input name="icon" value="{{ mission.icon if mission else '🎯' }}" maxlength="4" style="font-size:20px">
+
+  <label>Название миссии *</label>
+  <input name="title" required value="{{ mission.title if mission else '' }}" placeholder="Купи 3 товара">
+
+  <label>Описание</label>
+  <textarea name="description" rows="2" placeholder="Что нужно сделать">{{ mission.description if mission else '' }}</textarea>
+
+  <label>Код (уникальный, латиницей)</label>
+  <input name="code" value="{{ mission.code if mission else '' }}" {% if mission %}disabled{% endif %} placeholder="buy_3_items">
+
+  <label>Сколько раз выполнить *</label>
+  <input name="target_value" type="number" min="1" value="{{ mission.target_value if mission else 1 }}" required>
+
+  <label>💰 Награда (баллы) *</label>
+  <input name="reward_value" type="number" min="1" value="{{ mission.reward_value if mission else 100 }}" required>
+
+  <div id="url-block" style="display:none">
+    <label>Ссылка (куда подписаться / куда пост)</label>
+    <input name="action_url" value="{{ mission.action_url if mission else '' }}" placeholder="https://instagram.com/...">
+  </div>
+
+  <div id="platform-block" style="display:none">
+    <label>Платформа</label>
+    <select name="platform">
+      <option value="">— выберите —</option>
+      <option value="instagram" {% if mission and mission.platform == 'instagram' %}selected{% endif %}>Instagram</option>
+      <option value="vk" {% if mission and mission.platform == 'vk' %}selected{% endif %}>VK</option>
+      <option value="telegram" {% if mission and mission.platform == 'telegram' %}selected{% endif %}>Telegram</option>
+      <option value="youtube" {% if mission and mission.platform == 'youtube' %}selected{% endif %}>YouTube</option>
+      <option value="tiktok" {% if mission and mission.platform == 'tiktok' %}selected{% endif %}>TikTok</option>
+      <option value="other" {% if mission and mission.platform == 'other' %}selected{% endif %}>Другое</option>
+    </select>
+  </div>
+
+  <label>Подсказка для проверки</label>
+  <input name="verify_hint" value="{{ mission.verify_hint if mission else '' }}" placeholder="Скинь скриншот или ссылку">
+
+  <label>Повторяемость</label>
+  <select name="repeat_type">
+    <option value="once" {% if mission and mission.repeat_type == 'once' %}selected{% endif %}>Один раз</option>
+    <option value="daily" {% if mission and mission.repeat_type == 'daily' %}selected{% endif %}>Ежедневно</option>
+    <option value="weekly" {% if mission and mission.repeat_type == 'weekly' %}selected{% endif %}>Еженедельно</option>
+    <option value="monthly" {% if mission and mission.repeat_type == 'monthly' %}selected{% endif %}>Ежемесячно</option>
+  </select>
+
+  <label style="display:flex;align-items:center;gap:10px;margin-top:20px">
+    <input type="checkbox" name="requires_approval" value="1" style="width:auto"
+           {% if mission and mission.requires_approval %}checked{% endif %}>
+    Требуется подтверждение админом
+  </label>
+
+  <div style="margin-top:24px;display:flex;gap:12px">
+    <button class="btn btn-success" type="submit" style="flex:1">
+      💾 {{ 'Сохранить' if mission else 'Создать' }}
+    </button>
+    <a href="/missions" class="btn" style="background:#95a5a6">Отмена</a>
+  </div>
+
+</form>
+</div>
+
+<style>
+.type-card{
+  display:flex;align-items:center;gap:10px;
+  padding:16px 12px;border:2px solid #e5e5ea;border-radius:12px;
+  cursor:pointer;transition:all .3s;text-align:center;
+  flex-direction:column;
+}
+.type-card:hover{border-color:#7c3aed;transform:translateY(-2px)}
+.type-card input{display:none}
+.type-card input:checked + div{color:#7c3aed}
+.type-card:has(input:checked){border-color:#7c3aed;background:rgba(124,58,237,.06)}
+</style>
+
+<script>
+function updateFields(){
+  var cat = document.querySelector('input[name="mission_category"]:checked').value;
+  var urlBlock = document.getElementById('url-block');
+  var platformBlock = document.getElementById('platform-block');
+  
+  if(cat === 'subscribe' || cat === 'post'){
+    urlBlock.style.display = 'block';
+    platformBlock.style.display = 'block';
+  } else {
+    urlBlock.style.display = 'none';
+    platformBlock.style.display = 'none';
+  }
+}
+document.querySelectorAll('input[name="mission_category"]').forEach(function(el){
+  el.addEventListener('change', updateFields);
+});
+updateFields();
+</script>
+
+{% endblock %}

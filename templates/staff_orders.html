@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% block content %}
+<h1>📋 Заказы покупателей</h1>
+<div class="card">
+<table>
+<thead><tr><th>№</th><th>Клиент</th><th>Телефон</th><th>Адрес</th><th>Итого</th><th>Сотрудник</th><th>📊 Статус</th><th></th></tr></thead>
+<tbody>
+{% for o in orders %}
+<tr>
+<td>#{{ o.id }}</td><td><a href="/customer/{{ o.customer_id }}" style="color:#3498db">{{ o.customer_name }}</a></td><td>{{ o.customer_phone }}</td>
+<td>{{ o.address or '-' }}</td><td>{{ '%.2f'|format(o.total_amount) }} ₽</td>
+<td>{{ o.staff_name or '-' }}</td>
+<td>{% if o.status=='new' %}Новый{% elif o.status=='taken' %}Принят{% elif o.status=='delivered' %}Доставлен{% else %}{{ o.status }}{% endif %}</td>
+<td><a href="/orders/{{ o.id }}" class="btn btn-sm">Открыть</a></td>
+</tr>
+{% else %}<tr><td colspan="8" style="text-align:center;padding:20px">Заказов нет</td></tr>
+{% endfor %}
+</tbody></table></div>
+{% endblock %}

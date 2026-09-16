@@ -1,0 +1,107 @@
+{% extends "base.html" %}{% block content %}
+<h1>📋 Заказ #{{ order.id }}</h1>
+
+<div class="card">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div>
+      <p><b>Клиент:</b> <a href="/customer/{{ order.customer_id }}" style="color:#3498db">{{ order.customer_name }}</a> · {{ order.customer_phone }}</p>
+      <p><b>Адрес:</b> {{ order.address or '—' }}</p>
+      <p><b>Комментарий:</b> {{ order.comment or '—' }}</p>
+    </div>
+    <div>
+      <p><b>Сумма:</b> <span style="font-size:20px;font-weight:900;color:#e74c3c">{{ "%.2f"|format(order.total_amount) }} ₽</span></p>
+      <p><b>Статус:</b>
+        {% if order.status == 'new' %}🆕 Новый
+        {% elif order.status == 'taken' %}📦 Принят
+        {% elif order.status == 'delivered' %}✅ Доставлен
+        {% elif order.status == 'cancelled' %}❌ Отменён
+        {% else %}{{ order.status }}{% endif %}
+      </p>
+      {% if order.staff_name %}<p><b>Сотрудник:</b> {{ order.staff_name }}</p>{% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>🛒 Состав заказа</h3>
+  <table style="margin-top:12px">
+    <thead><tr>
+      <th>Товар</th><th>Цена</th><th>Кол-во</th><th style="text-align:right">Сумма</th>
+    </tr></thead>
+    <tbody>
+    {% for it in order['items'] %}
+    <tr>
+      <td>{{ it.product_name }}</td>
+      <td>{{ "%.2f"|format(it.product_price) }} ₽</td>
+      <td>{{ it.quantity }}</td>
+      <td style="text-align:right"><b>{{ "%.2f"|format(it.subtotal) }} ₽</b></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if order.status == 'new' %}
+<div class="card" style="border-left:4px solid #3498db">
+  <h3 style="margin-bottom:12px">🎯 Готовы взять заказ?</h3>
+  <form method="post" action="/orders/{{ order.id }}/take">
+    <button class="btn btn-success" type="submit" style="padding:16px 32px;font-size:16px">
+      🎯 Взять заказ
+    </button>
+  </form>
+</div>
+{% endif %}
+
+{% if order.taken_by == user.id and order.status == 'taken' %}
+<div class="card" style="border-left:4px solid #27ae60">
+  <h3 style="margin-bottom:12px">📦 Готовы отметить доставку?</h3>
+  <p style="color:#7f8c8d;font-size:14px;margin-bottom:16px">
+    Укажите какие товары доставили, куда поступили деньги, и подтвердите доставку
+  </p>
+  <a href="/orders/{{ order.id }}/deliver-form" class="btn btn-success" style="width:100%;padding:16px;font-size:16px">
+    ✅ Оформить доставку
+  </a>
+</div>
+{% endif %}
+
+{% if order.status == 'delivered' %}
+<div class="card" style="border-left:4px solid #27ae60;background:#f0fff4">
+  <h3 style="margin:0">✅ Заказ доставлен</h3>
+  {% if order.paid_amount %}
+  <p style="margin-top:8px;color:#16a085">Сумма поступления: <b>{{ "%.2f"|format(order.paid_amount) }} ₽</b></p>
+  {% endif %}
+  {% if order.payment_status == 'pending' %}
+  <p style="color:#f39c12;margin-top:8px">⏳ Ожидает подтверждения бухгалтера</p>
+  {% elif order.payment_status == 'paid' %}
+  <p style="color:#27ae60;margin-top:8px">💰 Деньги зачислены на счёт</p>
+  {% endif %}
+</div>
+{% endif %}
+
+<div class="card">
+  <h3>💬 Чат с покупателем</h3>
+  <div id="chat" style="height:300px;overflow-y:auto;background:#f8f9fa;padding:12px;border-radius:8px;margin:12px 0">
+    {% for m in messages %}
+    <div style="margin-bottom:10px;{% if m.sender_type == 'staff' %}text-align:right{% endif %}">
+      <span style="background:{% if m.sender_type == 'staff' %}#3498db{% else %}#ecf0f1{% endif %};
+                   color:{% if m.sender_type == 'staff' %}#fff{% else %}#333{% endif %};
+                   padding:8px 14px;border-radius:14px;display:inline-block;max-width:70%;text-align:left">
+        <b style="font-size:11px;opacity:.7">{{ m.sender_name }}</b><br>
+        {{ m.message }}
+      </span>
+    </div>
+    {% else %}
+    <p style="text-align:center;color:#95a5a6;padding:20px">Сообщений пока нет</p>
+    {% endfor %}
+  </div>
+  <form method="post" action="/orders/{{ order.id }}/chat" style="display:flex;gap:8px">
+    <input name="message" placeholder="Написать сообщение..." style="margin:0;flex:1" autocomplete="off">
+    <button class="btn" type="submit">📤 Отправить</button>
+  </form>
+</div>
+
+<div style="margin-top:20px">
+  <a href="/orders" class="btn" style="background:#95a5a6">← Все заказы</a>
+</div>
+
+{% endblock %}

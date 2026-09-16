@@ -1,0 +1,11 @@
+{% extends "shop/base.html" %}{% block content %}
+<div class="card" style="max-width:400px;margin:60px auto">
+<h1>🔐 Вход</h1>
+<form method="post">
+<label>Телефон</label><input name="phone" type="tel" required>
+<label>Пароль</label><input name="password" type="password" required>
+<button class="btn" type="submit" style="width:100%">🔐 Вход</button>
+</form>
+<p style="margin-top:16px;text-align:center"><a href="/shop/register" style="color:#e74c3c">📝 Регистрация</a></p>
+</div>
+{% endblock %}

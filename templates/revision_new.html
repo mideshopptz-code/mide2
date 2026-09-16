@@ -1,0 +1,17 @@
+{% extends "base.html" %}{% block content %}
+<div class="card" style="max-width:500px;margin:auto">
+<h1>📝 Запросить ревизию</h1>
+<form method="post">
+    <label>Кого проверить</label>
+    <select name="target_user_id" required>
+        <option value="">-- выберите --</option>
+        {% for t in targets %}
+        <option value="{{ t.id }}">{{ t.full_name or t.username }} ({{ t.role }})</option>
+        {% endfor %}
+    </select>
+    <label>Комментарий</label>
+    <textarea name="comment" rows="2"></textarea>
+    <button class="btn btn-warning" type="submit">Отправить</button>
+</form>
+</div>
+{% endblock %}

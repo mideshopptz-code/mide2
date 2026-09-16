@@ -1,0 +1,25 @@
+{% extends "shop/base.html" %}{% block content %}
+<h1>📋 Мои заказы</h1>
+{% for o in orders %}
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<b>Заказ #{{ o.id }}</b>
+<span style="padding:4px 12px;border-radius:12px;font-size:12px;
+{% if o.status=='new' %}background:#fff3cd;color:#856404
+{% elif o.status=='taken' %}background:#cce5ff;color:#004085
+{% elif o.status=='delivered' %}background:#d4edda;color:#155724
+{% else %}background:#f8d7da;color:#721c24{% endif %}">
+{% if o.status=='new' %}Новый{% elif o.status=='taken' %}Принят{% elif o.status=='delivered' %}Доставлен{% else %}{{ o.status }}{% endif %}
+</span></div>
+<div style="font-size:13px;color:#7f8c8d">Адрес: {{ o.address or '-' }}</div>
+{% for it in o['items'] %}
+<div style="font-size:13px;margin-top:6px">{{ it.product_name }} x {{ it.quantity }} = {{ '%.2f'|format(it.subtotal) }} ₽</div>
+{% endfor %}
+<div style="text-align:right;margin-top:12px;font-size:16px;font-weight:bold;color:#e74c3c">
+{{ '%.2f'|format(o.total_amount) }} ₽</div>
+<a href="/shop/orders/{{ o.id }}" class="btn btn-sm" style="margin-top:12px">Открыть</a>
+</div>
+{% else %}<div class="card" style="text-align:center;padding:60px;color:#7f8c8d">
+No orders. <a href="/shop" style="color:#e74c3c">Перейти в каталог</a>
+</div>{% endfor %}
+{% endblock %}

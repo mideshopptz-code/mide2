@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% block content %}
+<div class="card" style="max-width:400px;margin:60px auto">
+<h1>Регистрация сотрудника</h1>
+<form method="post">
+<label>Логин</label><input name="username" required>
+<label>Пароль</label><input name="password" type="password" required>
+<label>Полное имя</label><input name="full_name">
+<button class="btn btn-success" type="submit" style="width:100%">📝 Регистрация</button>
+</form>
+<p style="margin-top:12px"><a href="/login">Already have account? Login</a></p>
+</div>
+{% endblock %}

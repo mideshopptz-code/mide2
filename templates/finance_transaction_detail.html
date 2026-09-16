@@ -1,0 +1,75 @@
+{% extends "base.html" %}{% block content %}
+<h1>💳 Транзакция #{{ tx.id }}</h1>
+
+<div class="card">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div>
+      <h3>📋 Информация</h3>
+      <p><b>Дата:</b> {{ tx.created_at }}</p>
+      <p><b>Тип:</b> {% if tx.type == 'income' %}📥 Поступление{% else %}📤 Расход{% endif %}</p>
+      <p><b>Счёт:</b> {{ tx.account_name or '—' }}</p>
+      {% if tx.account_number and tx.account_number != '-' %}
+      <p><b>Номер счёта:</b>
+        <code style="background:#f8f9fa;padding:6px 12px;border-radius:6px;font-size:15px;font-family:'Courier Новый',monospace;border:1px solid #e5e5ea">
+          {{ tx.account_number }}
+        </code>
+      </p>
+      {% endif %}
+      {% if tx.account_bank %}
+      <p><b>Банк:</b> {{ tx.account_bank }}</p>
+      {% endif %}
+      <p><b>Сумма:</b>
+        <span style="font-size:22px;font-weight:900;color:{% if tx.type == 'income' %}#27ae60{% else %}#e74c3c{% endif %}">
+          {% if tx.type == 'income' %}+{% else %}−{% endif %}{{ "%.2f"|format(tx.amount) }} ₽
+        </span>
+      </p>
+      {% if tx.seller_name %}<p><b>Продавец:</b> {{ tx.seller_name }}</p>{% endif %}
+      {% if tx.requester_name and tx.requester_name != tx.seller_name %}
+      <p><b>Запросил:</b> {{ tx.requester_name }}</p>
+      {% endif %}
+      {% if tx.order_id %}<p><b>Заказ:</b> <a href="/orders/{{ tx.order_id }}" style="color:#3498db">#{{ tx.order_id }}</a></p>{% endif %}
+      {% if tx.comment %}<p><b>Комментарий:</b> {{ tx.comment }}</p>{% endif %}
+    </div>
+    <div>
+      <h3>Статус</h3>
+      <div style="font-size:24px;font-weight:900;color:{% if tx.status == 'pending' %}#f39c12{% elif tx.status == 'approved' %}#27ae60{% else %}#e74c3c{% endif %}">
+        {% if tx.status == 'pending' %}⏳ Ожидает{% elif tx.status == 'approved' %}✅ Одобрено{% else %}❌ Отклонено{% endif %}
+      </div>
+      {% if tx.reviewed_at %}
+      <p style="margin-top:12px;font-size:13px;color:#7f8c8d">
+        Обработано: {{ tx.reviewed_at }}
+      </p>
+      {% endif %}
+      {% if tx.reviewer_name %}
+      <p style="font-size:13px;color:#7f8c8d">
+        Проверил: {{ tx.reviewer_name }}
+      </p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if tx.status == 'pending' %}
+<div class="card" style="border-left:4px solid #f39c12">
+  <h3>Действия</h3>
+  <p style="color:#7f8c8d;font-size:13px;margin-bottom:16px">
+    Проверьте поступление. Если всё верно — подтвердите, и баланс счёта увеличится.
+  </p>
+  <form method="post">
+    <label>Комментарий (опционально)</label>
+    <textarea name="comment" rows="2"></textarea>
+    <div style="display:flex;gap:12px;margin-top:12px">
+      <button name="approve" value="1" class="btn btn-success" type="submit" style="padding:14px 32px;font-size:16px">
+        ✅ Подтвердить
+      </button>
+      <button name="approve" value="0" class="btn btn-danger" type="submit" style="padding:14px 32px;font-size:16px">
+        ❌ Отклонить
+      </button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<a href="/finance" class="btn" style="background:#95a5a6">← Назад к финансам</a>
+
+{% endblock %}
