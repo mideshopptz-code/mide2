@@ -1,0 +1,119 @@
+# -*- coding: utf-8 -*-
+import os
+
+os.makedirs("static/uploads", exist_ok=True)
+
+T = {}
+
+T["templates/dashboard.html"] = """{% extends "base.html" %}{% block content %}
+<h1>Dashboard</h1>
+<div class="stats">
+<div class="stat-box"><h3>Total orders</h3><div class="value">{{ stats.total_orders or 0 }}</div></div>
+<div class="stat-box"><h3>Delivered</h3><div class="value" style="color:#27ae60">{{ stats.delivered or 0 }}</div></div>
+<div class="stat-box"><h3>Revenue</h3><div class="value">{{ "%.0f"|format(stats.revenue or 0) }} RUB</div></div>
+</div>
+<div class="card">
+<h3>Top products</h3>
+<table><thead><tr><th>Product</th><th>Qty</th><th>Revenue</th></tr></thead><tbody>
+{% for p in top_products %}
+<tr><td>{{ p.product_name }}</td><td>{{ p.qty }}</td><td>{{ "%.0f"|format(p.revenue) }} RUB</td></tr>
+{% else %}
+<tr><td colspan="3" style="text-align:center;padding:20px">No data</td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+<div class="card">
+<h3>Top sellers</h3>
+<table><thead><tr><th>Seller</th><th>Orders</th><th>Revenue</th></tr></thead><tbody>
+{% for s in top_sellers %}
+<tr><td>{{ s.full_name or s.username }}</td><td>{{ s.count }}</td><td>{{ "%.0f"|format(s.revenue) }} RUB</td></tr>
+{% else %}
+<tr><td colspan="3" style="text-align:center;padding:20px">No data</td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+{% endblock %}"""
+
+T["templates/kpi.html"] = """{% extends "base.html" %}{% block content %}
+<h1>KPI Leaderboard</h1>
+<div class="card">
+<table><thead><tr><th>#</th><th>Seller</th><th>Sales</th><th>Revenue</th><th>Accuracy</th></tr></thead><tbody>
+{% for k in leaderboard %}
+<tr><td>{{ k.rank }}</td><td>{{ k.full_name or k.username }}</td><td>{{ k.sales_count }}</td><td>{{ "%.0f"|format(k.revenue) }} RUB</td><td>{{ k.accuracy }}%</td></tr>
+{% else %}
+<tr><td colspan="5" style="text-align:center;padding:20px">No data</td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+{% endblock %}"""
+
+T["templates/zones.html"] = """{% extends "base.html" %}{% block content %}
+<h1>Delivery zones</h1>
+<div class="card">
+<h3>Add zone</h3>
+<form method="post" action="/zones/add">
+<input name="name" placeholder="Name" required>
+<input name="fee" type="number" placeholder="Fee" value="200">
+<input name="free_from" type="number" placeholder="Free from" value="0">
+<input name="eta" type="number" placeholder="ETA min" value="60">
+<button class="btn btn-success" type="submit">Add</button>
+</form>
+</div>
+<div class="card">
+<table><thead><tr><th>Name</th><th>Fee</th><th>Free from</th><th>ETA</th></tr></thead><tbody>
+{% for z in zones %}
+<tr><td>{{ z.name }}</td><td>{{ z.delivery_fee }} RUB</td><td>{{ z.free_from }} RUB</td><td>{{ z.eta_minutes }} min</td></tr>
+{% else %}
+<tr><td colspan="4" style="text-align:center;padding:20px">No zones</td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+{% endblock %}"""
+
+T["templates/product_images.html"] = """{% extends "base.html" %}{% block content %}
+<h1>Images: {{ product.name }}</h1>
+<div class="card">
+<form method="post" enctype="multipart/form-data">
+<label>Add image</label>
+<input name="image" type="file" accept="image/*" required>
+<button class="btn btn-success" type="submit">Upload</button>
+</form>
+</div>
+<div class="card">
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
+{% for img in images %}
+<div style="background:#f8f9fa;padding:8px;border-radius:6px;text-align:center">
+<img src="/static/uploads/{{ img.filename }}" style="width:100%;height:150px;object-fit:cover;border-radius:4px">
+</div>
+{% else %}
+<p style="color:#7f8c8d">No images</p>
+{% endfor %}
+</div>
+</div>
+{% endblock %}"""
+
+T["templates/shop/missions.html"] = """{% extends "shop/base.html" %}{% block content %}
+<h1>Missions</h1>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+{% for m in missions %}
+<div class="card">
+<div style="font-size:36px">{{ m.icon }}</div>
+<h3>{{ m.title }}</h3>
+<p style="font-size:13px;color:#7f8c8d">{{ m.description }}</p>
+<div style="margin-top:12px;padding:10px;background:#fff3cd;border-radius:6px;font-size:13px">
+<b>Reward:</b> +{{ m.reward_value|int }} bonus points
+</div>
+<form method="post" action="/shop/missions/{{ m.id }}/claim" style="margin-top:12px">
+<button class="btn btn-success" type="submit" style="width:100%">Claim reward</button>
+</form>
+</div>
+{% endfor %}
+</div>
+{% endblock %}"""
+
+for path, content in T.items():
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(content)
+    print("OK " + path)
+
+print("All restored")

@@ -1,0 +1,9 @@
+import os
+
+
+class Config:
+    SECRET_KEY = "CHANGE_ME_SECRET_KEY_2024"
+    DB_NAME = "warehouse.db"
+
+    TELEGRAM_BOT_TOKEN = "8803372960:AAEk6wPN0H22-bI-9IF1NZEXZY16f9m7cLg"
+    TELEGRAM_ENABLED = bool(TELEGRAM_BOT_TOKEN)
